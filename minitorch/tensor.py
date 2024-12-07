@@ -32,6 +32,7 @@ from .tensor_functions import (
     View,
     tensor,
 )
+import minitorch
 
 if TYPE_CHECKING:
     from typing import Any, Iterable, List, Optional, Sequence, Tuple, Type, Union
@@ -352,6 +353,10 @@ class Tensor:
             return Sum.apply(self.contiguous().view(self.size), self._ensure_tensor(0))
         else:
             return Sum.apply(self, self._ensure_tensor(dim))
+
+    def max(self, dim: Optional[int] = None) -> Tensor:
+        """Sum over a dimension."""
+        return minitorch.max(self, dim)
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         """Mean over a dimension."""
