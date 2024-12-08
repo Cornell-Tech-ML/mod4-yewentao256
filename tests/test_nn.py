@@ -31,7 +31,7 @@ def test_avg(t: Tensor) -> None:
 
 @pytest.mark.task4_4
 @given(tensors(shape=(2, 3, 4)))
-def test_max_forward(t: Tensor) -> None:
+def test_max_random(t: Tensor) -> None:
     expected_max = max(
         t[i, j, k]
         for i in range(t.shape[0])

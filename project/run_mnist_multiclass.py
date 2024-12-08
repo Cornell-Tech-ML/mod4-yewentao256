@@ -62,7 +62,7 @@ class Network(minitorch.Module):
 
     def __init__(self):
         super().__init__()
-        
+
         self.conv1 = Conv2d(1, 4, 3, 3)
         self.conv2 = Conv2d(4, 8, 3, 3)
         self.fc1 = Linear(392, 64)

@@ -34,7 +34,7 @@ def tile(input: Tensor, kernel: Tuple[int, int]) -> Tuple[Tensor, int, int]:
     kh, kw = kernel
     assert height % kh == 0
     assert width % kw == 0
-    
+
     new_height = height // kh
     new_width = width // kw
 
@@ -62,7 +62,7 @@ class Max(Function):
     def forward(ctx: Context, t1: Tensor, dim: Tensor) -> Tensor:
         """Compute the maximum values along a specified dimension."""
         max_val = t1.f.max_reduce(t1, int(dim.item()))
-        eq_mask = (t1 == max_val)
+        eq_mask = t1 == max_val
         ctx.save_for_backward(eq_mask, dim)
         return max_val
 
@@ -70,14 +70,14 @@ class Max(Function):
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
         """Calculate the gradient for Max."""
         eq_mask, dim = ctx.saved_values
-        
+
         true_shape = TensorData.shape_broadcast(grad_output.shape, eq_mask.shape)
         grad_broadcast = grad_output.zeros(true_shape)
         grad_output.f.id_map(grad_output, grad_broadcast)
         grad_input = grad_broadcast * eq_mask / eq_mask.sum(dim=int(dim.item()))
         return grad_input, 0.0
 
-        
+
 def max(input: Tensor, dim: Optional[int] = None) -> Tensor:
     """Compute the maximum values along a specified dimension."""
     if dim is None:
@@ -91,14 +91,14 @@ def argmax(input: Tensor, dim: Optional[int] = None) -> Tensor:
     if dim is None:
         flat = input.contiguous().view(input.size)
         max_val = max(flat)
-        argm = (flat == max_val)
+        argm = flat == max_val
         return argm.view(*input.shape)
     else:
         max_val = max(input, dim=dim)
         shape = list(input.shape)
         shape[dim] = 1
         max_val_broadcast = max_val.view(*shape)
-        argm = (input == max_val_broadcast)
+        argm = input == max_val_broadcast
         return argm
 
 
@@ -153,7 +153,7 @@ def dropout(input: Tensor, p: float = 0.5, ignore: bool = False) -> Tensor:
         return input
     if p >= 1.0:
         return input.zeros()
-    mask = (rand(input.shape) > p)
-    
+    mask = rand(input.shape) > p
+
     # Scale the output by 1/(1-p) to keep expected value constant
     return input * mask / (1 - p)
