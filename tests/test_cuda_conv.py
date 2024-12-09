@@ -6,7 +6,7 @@ from minitorch.cuda_conv import CudaConvOps
 Fast_Backend = minitorch.TensorBackend(minitorch.FastOps)
 Cuda_Backend = minitorch.TensorBackend(minitorch.CudaOps)
 
-@pytest.mark.task4_4
+
 def test_conv1d_cuda_simple() -> None:
     # A known simple test input
     # CPU version
@@ -24,14 +24,13 @@ def test_conv1d_cuda_simple() -> None:
         assert out_cpu[0, 0, i] == out_gpu[0, 0, i]
 
 
-@pytest.mark.task4_4
 def test_conv1d_cuda_random() -> None:
     # random input list of size 100
     input_size = 100
     weight_size = 5
     input_list = random.choices(range(10086), k=input_size)
     weight_list = random.choices(range(10086), k=weight_size)
-    
+
     # CPU version
     t_cpu = minitorch.tensor(input_list, backend=Fast_Backend).view(1, 1, input_size)
     w_cpu = minitorch.tensor(weight_list, backend=Fast_Backend).view(1, 1, weight_size)
@@ -47,33 +46,16 @@ def test_conv1d_cuda_random() -> None:
         assert out_cpu[0, 0, i] == out_gpu[0, 0, i]
 
 
-@pytest.mark.task4_4
 def test_conv2d_cuda_simple() -> None:
     # A simple known-pattern test
     # CPU version
-    t_cpu = minitorch.tensor(
-        [[0, 1],
-         [2, 3]],
-        backend=Fast_Backend
-    ).view(1, 1, 2, 2)
-    w_cpu = minitorch.tensor(
-        [[1, 1],
-         [1, 1]],
-        backend=Fast_Backend
-    ).view(1, 1, 2, 2)
+    t_cpu = minitorch.tensor([[0, 1], [2, 3]], backend=Fast_Backend).view(1, 1, 2, 2)
+    w_cpu = minitorch.tensor([[1, 1], [1, 1]], backend=Fast_Backend).view(1, 1, 2, 2)
     out_cpu = minitorch.Conv2dFun.apply(t_cpu, w_cpu)
 
     # GPU version
-    t_gpu = minitorch.tensor(
-        [[0, 1],
-         [2, 3]],
-        backend=Cuda_Backend
-    ).view(1, 1, 2, 2)
-    w_gpu = minitorch.tensor(
-        [[1, 1],
-         [1, 1]],
-        backend=Cuda_Backend
-    ).view(1, 1, 2, 2)
+    t_gpu = minitorch.tensor([[0, 1], [2, 3]], backend=Cuda_Backend).view(1, 1, 2, 2)
+    w_gpu = minitorch.tensor([[1, 1], [1, 1]], backend=Cuda_Backend).view(1, 1, 2, 2)
     out_gpu = CudaConvOps.conv2d(t_gpu, w_gpu)
 
     for i in range(2):
@@ -81,7 +63,6 @@ def test_conv2d_cuda_simple() -> None:
             assert out_cpu[0, 0, i, j] == out_gpu[0, 0, i, j]
 
 
-@pytest.mark.task4_4
 def test_conv2d_cuda_random() -> None:
     # Random input tensor of size 4x4 and weight tensor of size 2x2
     input_size = (100, 100)
