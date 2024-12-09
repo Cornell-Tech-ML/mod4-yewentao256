@@ -1,5 +1,4 @@
 import random
-import pytest
 import minitorch
 from minitorch.cuda_conv import CudaConvOps
 

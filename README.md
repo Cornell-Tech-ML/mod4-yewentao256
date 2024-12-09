@@ -40,3 +40,7 @@ minitorch/tensor_data.py minitorch/tensor_functions.py minitorch/tensor_ops.py m
 ### Mnist
 
 [Logs](mnist.txt)
+
+### Sentiment
+
+[Logs](sentiment.txt)
