@@ -365,9 +365,9 @@ class Tensor:
         else:
             return self.sum() / self.size
 
-    def is_close(self, other: TensorLike) -> Tensor:
+    def is_close(self, y: Tensor) -> Tensor:
         """Check if two tensors are close."""
-        return IsClose.apply(self, self._ensure_tensor(other))
+        return IsClose.apply(self, y)
 
     def permute(self, *order: int) -> Tensor:
         """Permute the dimensions of this tensor."""

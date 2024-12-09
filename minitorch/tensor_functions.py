@@ -127,15 +127,15 @@ class Sigmoid(Function):
     @staticmethod
     def forward(ctx: Context, t1: Tensor) -> Tensor:
         """Sigmoid function applied element-wise."""
-        output = t1.f.sigmoid_map(t1)
-        ctx.save_for_backward(output)
-        return output
+        out = t1.f.sigmoid_map(t1)
+        ctx.save_for_backward(out)
+        return out
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Backward pass for Sigmoid."""
-        (output,) = ctx.saved_values  # output = sigmoid(t1)
-        return output * (-output + 1.0) * grad_output
+        out = ctx.saved_values[0]  # output = sigmoid(t1)
+        return out * (-out + 1.0) * grad_output
 
 
 class ReLU(Function):
