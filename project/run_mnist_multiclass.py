@@ -41,8 +41,8 @@ class Conv2d(minitorch.Module):
         self.bias = RParam(out_channels, 1, 1)
 
     def forward(self, input):
-        # TODO: Implement for Task 4.5.
-        raise NotImplementedError("Need to implement for Task 4.5")
+        conv_result = minitorch.Conv2dFun.apply(input, self.weights.value)
+        return conv_result + self.bias.value
 
 
 class Network(minitorch.Module):
@@ -63,16 +63,26 @@ class Network(minitorch.Module):
     def __init__(self):
         super().__init__()
 
-        # For vis
-        self.mid = None
-        self.out = None
-
-        # TODO: Implement for Task 4.5.
-        raise NotImplementedError("Need to implement for Task 4.5")
+        self.conv1 = Conv2d(1, 4, 3, 3)
+        self.conv2 = Conv2d(4, 8, 3, 3)
+        self.fc1 = Linear(392, 64)
+        self.fc2 = Linear(64, 10)
+        self.dropout = 0.25
 
     def forward(self, x):
-        # TODO: Implement for Task 4.5.
-        raise NotImplementedError("Need to implement for Task 4.5")
+        # x: [batch, 1, 28, 28]
+        x = self.conv1(x).relu()            # [batch, 4, 28, 28]
+        x = self.conv2(x).relu()            # [batch, 8, 28, 28]
+        x = minitorch.maxpool2d(x, (4, 4))  # [batch, 8, 7, 7]
+        batch = x.shape[0]
+        x = x.view(batch, 392)              # [batch, 392]
+
+        x = self.fc1(x).relu()              # [batch, 64]
+        if self.training:
+            x = minitorch.dropout(x, self.dropout)
+
+        x = self.fc2(x)                     # [batch, 10]
+        return minitorch.logsoftmax(x, dim=1)
 
 
 def make_mnist(start, stop):
@@ -86,9 +96,12 @@ def make_mnist(start, stop):
         X.append([[images[i][h * W + w] for w in range(W)] for h in range(H)])
     return X, ys
 
+f = open("mnist.txt", "w")
 
 def default_log_fn(epoch, total_loss, correct, total, losses, model):
-    print(f"Epoch {epoch} loss {total_loss} valid acc {correct}/{total}")
+    print(f"Epoch {epoch} loss {total_loss:.4f} valid acc {correct}/{total}")
+    f.write(f"Epoch {epoch} loss {total_loss:.4f} valid acc {correct}/{total}\n")
+    f.flush()
 
 
 class ImageTrain:
@@ -99,7 +112,7 @@ class ImageTrain:
         return self.model.forward(minitorch.tensor([x], backend=BACKEND))
 
     def train(
-        self, data_train, data_val, learning_rate, max_epochs=500, log_fn=default_log_fn
+        self, data_train, data_val, learning_rate, max_epochs=25, log_fn=default_log_fn
     ):
         (X_train, y_train) = data_train
         (X_val, y_val) = data_val
